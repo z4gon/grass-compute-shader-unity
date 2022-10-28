@@ -37,7 +37,7 @@ public static class Grass
 
         // define the normals
         Vector3[] normalsArray = new Vector3[mesh.vertices.Length];
-        Array.Fill(normalsArray, new Vector3(0, 0, 1));
+        Array.Fill(normalsArray, new Vector3(0, 0, -1));
         mesh.normals = normalsArray;
 
         mesh.uv = new Vector2[] {
@@ -68,10 +68,20 @@ public static class Grass
                 0,1,2,
                 2,1,3,
 
+                // step 1
+                2,3,4,
+                4,3,5,
+
+                // step 2
+                4,5,6,
+                6,5,7,
+
+                // step 3
+                6,7,8,
             },
             topology: MeshTopology.Triangles,
             submesh: 0
-        )
+        );
 
         return mesh;
     }
