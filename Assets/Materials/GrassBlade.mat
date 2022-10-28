@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MyMaterial
-  m_Shader: {fileID: 4800000, guid: e85c11165009b445380ce5f5d594c977, type: 3}
+  m_Name: GrassBlade
+  m_Shader: {fileID: 4800000, guid: 00232651897ae4284bedcba897afd4fc, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _DEBUGGRADIENTS_ON
@@ -87,6 +87,6 @@ Material:
     - _UseTime: 1
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 0, b: 0, a: 1}
+    - _Color: {r: 0, g: 0.6698113, b: 0.022387069, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
