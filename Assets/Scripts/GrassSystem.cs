@@ -42,6 +42,33 @@ public class GrassSystem : MonoBehaviour
         _grassBladesCount = (int)(grassBladesCountX * grassBladesCountY);
 
         _grassBlades = new GrassBlade[_grassBladesCount];
+
+        for (var i = 0; i < _grassBlades.Length; i++)
+        {
+            var grassBlade = _grassBlades[i];
+
+            var localPos = new Vector3(
+                x: Random.Range(-_bounds.extents.x, _bounds.extents.x),
+                y: 0,
+                z: Random.Range(-_bounds.extents.z, _bounds.extents.z)
+            );
+
+            RaycastHit hit;
+            var didHit = Physics.Raycast(
+                origin: transform.TransformPoint(localPos) + (transform.up * 20),
+                direction: -transform.up,
+                hitInfo: out hit
+            );
+
+            if (didHit)
+            {
+                localPos.y = hit.point.y;
+            }
+
+            grassBlade.position = transform.TransformPoint(localPos);
+
+            _grassBlades[i] = grassBlade;
+        }
     }
 
     private void InitializeGrassBladesBuffer()
@@ -71,7 +98,7 @@ public class GrassSystem : MonoBehaviour
         const int _argsCount = 5;
 
         _argsBuffer = new ComputeBuffer(
-            count: 1,
+            count: _grassBladesCount,
             stride: _argsCount * sizeof(uint),
             type: ComputeBufferType.IndirectArguments
         );
@@ -81,7 +108,7 @@ public class GrassSystem : MonoBehaviour
         // to get the instance_id and vertex_id
         var args = new int[_argsCount] {
             (int)_mesh.GetIndexCount(submesh: 0),       // indices of the mesh
-            _grassBladesCount,                          // number of objects to render
+            1,                          // number of objects to render
             0,0,0                                       // unused args
         };
 
@@ -118,5 +145,20 @@ public class GrassSystem : MonoBehaviour
         {
             _argsBuffer.Release();
         }
+    }
+
+    void OnDrawGizmos()
+    {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        // // Gizmos.DrawSphere(new Vector3(1, 0, 1), 0.1f);
+        // for (var i = 0; i < _grassBlades.Length; i++)
+        // {
+        //     // Debug.Log($"grassBlade.position {_grassBlades[i].position}");
+        //     Gizmos.DrawSphere(_grassBlades[i].position, 0.1f);
+        // }
     }
 }

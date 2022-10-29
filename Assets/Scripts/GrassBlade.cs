@@ -2,5 +2,5 @@ using UnityEngine;
 
 struct GrassBlade
 {
-    Vector3 position;
+    public Vector3 position;
 }
