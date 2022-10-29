@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public static class Grass
+public static class GrassFactory
 {
     const float Height = 0.2f;
     const int StepsCount = 4;
@@ -9,7 +9,7 @@ public static class Grass
     const float HalfWidth = Height / 10;
 
     // Start is called before the first frame update
-    public static Mesh CreateGrassMesh()
+    public static Mesh GetGrassBladeMesh()
     {
         var mesh = new Mesh();
 
