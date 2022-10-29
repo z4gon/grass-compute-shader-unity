@@ -1,16 +1,16 @@
 using UnityEngine;
 
+[RequireComponent(typeof(MeshFilter))]
 public class GrassSystem : MonoBehaviour
 {
     public Material Material;
     public ComputeShader ComputeShader;
     public float Density = 1f;
-    public Bounds Bounds;
 
+    private GrassBlade[] _grassBlades;
     private ComputeBuffer _grassBladesBuffer;
 
-    private int _kernelIndexSetupGrassBlades;
-    private int _kernelIndexSimulateGrassBlades;
+    private int _kernelIndex;
 
     // for Graphics.DrawMeshInstancedIndirect
     private ComputeBuffer _argsBuffer;
@@ -25,30 +25,43 @@ public class GrassSystem : MonoBehaviour
     {
         _mesh = GrassFactory.GetGrassBladeMesh();
 
+        InitializeGrassBlades();
         InitializeGrassBladesBuffer();
         InitializeIndirectArgsBuffer();
 
         _isInitialized = true;
     }
 
+    private void InitializeGrassBlades()
+    {
+        _bounds = GetComponent<MeshFilter>().sharedMesh.bounds;
+
+        var grassBladesCountX = _bounds.extents.x * 2 * Density;
+        var grassBladesCountY = _bounds.extents.y * 2 * Density;
+
+        _grassBladesCount = (int)(grassBladesCountX * grassBladesCountY);
+
+        _grassBlades = new GrassBlade[_grassBladesCount];
+    }
+
     private void InitializeGrassBladesBuffer()
     {
-        // var vertexMemorySize = (3 + 3) * sizeof(float);
+        var grassBladeMemorySize = (3) * sizeof(float);
 
-        // _initialVerticesBuffer = new ComputeBuffer(_vertices.Length, _vertices.Length * vertexMemorySize);
-        // _deformedVerticesBuffer = new ComputeBuffer(_vertices.Length, _vertices.Length * vertexMemorySize);
+        _grassBladesBuffer = new ComputeBuffer(
+            count: _grassBlades.Length,
+            stride: _grassBlades.Length * grassBladeMemorySize
+        );
 
-        // _initialVerticesBuffer.SetData(_vertices);
-        // _deformedVerticesBuffer.SetData(_vertices);
+        _grassBladesBuffer.SetData(_grassBlades);
 
-        // _kernelIndex = ComputeShader.FindKernel("DeformVertices");
+        _kernelIndex = ComputeShader.FindKernel("SimulateGrass");
 
-        // // this will let compute shader access the buffers
-        // ComputeShader.SetBuffer(_kernelIndex, "InitialVertices", _initialVerticesBuffer);
-        // ComputeShader.SetBuffer(_kernelIndex, "DeformedVertices", _deformedVerticesBuffer);
+        // this will let compute shader access the buffers
+        ComputeShader.SetBuffer(_kernelIndex, "GrassBlades", _grassBladesBuffer);
 
-        // // this will let the surface shader access the buffer
-        // Material.SetBuffer("DeformedVertices", _deformedVerticesBuffer);
+        // this will let the surface shader access the buffer
+        Material.SetBuffer("GrassBlades", _grassBladesBuffer);
     }
 
     private void InitializeIndirectArgsBuffer()
@@ -67,7 +80,7 @@ public class GrassSystem : MonoBehaviour
         // this will be used by the vertex/fragment shader
         // to get the instance_id and vertex_id
         var args = new int[_argsCount] {
-            (int)_mesh.GetIndexCount(0),                // indices of the mesh
+            (int)_mesh.GetIndexCount(submesh: 0),       // indices of the mesh
             _grassBladesCount,                          // number of objects to render
             0,0,0                                       // unused args
         };
@@ -83,17 +96,15 @@ public class GrassSystem : MonoBehaviour
             return;
         }
 
-        // ComputeShader.SetFloat("Time", Time.time);
-        // ComputeShader.SetFloat("Radius", Radius);
-        // ComputeShader.SetFloat("Velocity", Velocity);
-        // ComputeShader.Dispatch(_kernelIndex, _vertices.Length, 1, 1);
-        // Graphics.DrawMeshInstancedIndirect(
-        //     mesh: Mesh,
-        //     submeshIndex: 0,
-        //     material: Material,
-        //     bounds: _bounds,
-        //     bufferWithArgs: _argsBuffer
-        // );
+        ComputeShader.SetFloat("Time", Time.time);
+        ComputeShader.Dispatch(_kernelIndex, _grassBlades.Length, 1, 1);
+        Graphics.DrawMeshInstancedIndirect(
+            mesh: _mesh,
+            submeshIndex: 0,
+            material: Material,
+            bounds: _bounds,
+            bufferWithArgs: _argsBuffer
+        );
     }
 
     void OnDestroy()

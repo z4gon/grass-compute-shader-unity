@@ -304,15 +304,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bb67fb3809088420baacca524319e825, type: 3}
       propertyPath: m_LocalScale.x
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bb67fb3809088420baacca524319e825, type: 3}
       propertyPath: m_LocalScale.y
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bb67fb3809088420baacca524319e825, type: 3}
       propertyPath: m_LocalScale.z
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bb67fb3809088420baacca524319e825, type: 3}
       propertyPath: m_LocalPosition.x
@@ -410,9 +410,6 @@ MonoBehaviour:
   Material: {fileID: 2100000, guid: 6596108dae55c40e7b84a2ad7e8e0fe7, type: 2}
   ComputeShader: {fileID: 7200000, guid: cd98ec0c441024352bcf99c2f94d7b9b, type: 3}
   Density: 1
-  Bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 30, y: 30, z: 0}
 --- !u!1 &878879245
 GameObject:
   m_ObjectHideFlags: 0
