@@ -6,6 +6,7 @@ public class GrassSystem : MonoBehaviour
     public Material Material;
     public ComputeShader ComputeShader;
     public float Density = 1f;
+    public float MaxExtent = 5f;
 
     private GrassBlade[] _grassBlades;
     private ComputeBuffer _grassBladesBuffer;
@@ -34,41 +35,15 @@ public class GrassSystem : MonoBehaviour
 
     private void InitializeGrassBlades()
     {
-        _bounds = GetComponent<MeshFilter>().sharedMesh.bounds;
-
-        var grassBladesCountX = _bounds.extents.x * 2 * Density;
-        var grassBladesCountY = _bounds.extents.y * 2 * Density;
-
-        _grassBladesCount = (int)(grassBladesCountX * grassBladesCountY);
-
-        _grassBlades = new GrassBlade[_grassBladesCount];
-
-        for (var i = 0; i < _grassBlades.Length; i++)
-        {
-            var grassBlade = _grassBlades[i];
-
-            var localPos = new Vector3(
-                x: Random.Range(-_bounds.extents.x, _bounds.extents.x),
-                y: 0,
-                z: Random.Range(-_bounds.extents.z, _bounds.extents.z)
-            );
-
-            RaycastHit hit;
-            var didHit = Physics.Raycast(
-                origin: transform.TransformPoint(localPos) + (transform.up * 20),
-                direction: -transform.up,
-                hitInfo: out hit
-            );
-
-            if (didHit)
-            {
-                localPos.y = hit.point.y;
-            }
-
-            grassBlade.position = transform.TransformPoint(localPos);
-
-            _grassBlades[i] = grassBlade;
-        }
+        GrassFactory.RaycastGrassBlades(
+            transform: transform,
+            meshFilter: GetComponent<MeshFilter>(),
+            maxExtent: MaxExtent,
+            density: Density,
+            bounds: out _bounds,
+            grassBladesCount: out _grassBladesCount,
+            grassBlades: out _grassBlades
+        );
     }
 
     private void InitializeGrassBladesBuffer()
@@ -108,7 +83,7 @@ public class GrassSystem : MonoBehaviour
         // to get the instance_id and vertex_id
         var args = new int[_argsCount] {
             (int)_mesh.GetIndexCount(submesh: 0),       // indices of the mesh
-            1,                          // number of objects to render
+            1,                                          // number of objects to render
             0,0,0                                       // unused args
         };
 
@@ -154,11 +129,11 @@ public class GrassSystem : MonoBehaviour
             return;
         }
 
-        // // Gizmos.DrawSphere(new Vector3(1, 0, 1), 0.1f);
-        // for (var i = 0; i < _grassBlades.Length; i++)
-        // {
-        //     // Debug.Log($"grassBlade.position {_grassBlades[i].position}");
-        //     Gizmos.DrawSphere(_grassBlades[i].position, 0.1f);
-        // }
+        // Gizmos.DrawSphere(new Vector3(1, 0, 1), 0.1f);
+        for (var i = 0; i < _grassBlades.Length; i++)
+        {
+            // Debug.Log($"grassBlade.position {_grassBlades[i].position}");
+            Gizmos.DrawSphere(_grassBlades[i].position, 0.01f);
+        }
     }
 }

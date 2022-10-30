@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public static class GrassFactory
@@ -37,7 +36,7 @@ public static class GrassFactory
 
         // define the normals
         Vector3[] normalsArray = new Vector3[mesh.vertices.Length];
-        Array.Fill(normalsArray, new Vector3(0, 0, -1));
+        System.Array.Fill(normalsArray, new Vector3(0, 0, -1));
         mesh.normals = normalsArray;
 
         mesh.uv = new Vector2[] {
@@ -84,5 +83,61 @@ public static class GrassFactory
         );
 
         return mesh;
+    }
+
+    public static void RaycastGrassBlades(
+        Transform transform,
+        MeshFilter meshFilter,
+        float maxExtent,
+        float density,
+        out Bounds bounds,
+        out int grassBladesCount,
+        out GrassBlade[] grassBlades
+    )
+    {
+        bounds = meshFilter.sharedMesh.bounds;
+
+        var cappedBounds = new Bounds(
+            transform.position,
+            new Vector3(
+                System.Math.Min(bounds.extents.x, maxExtent),
+                bounds.extents.y,
+                System.Math.Min(bounds.extents.z, maxExtent)
+            )
+        );
+
+        var grassBladesCountX = cappedBounds.extents.x * 2 * density;
+        var grassBladesCountY = cappedBounds.extents.y * 2 * density;
+
+        grassBladesCount = (int)(grassBladesCountX * grassBladesCountY);
+
+        grassBlades = new GrassBlade[grassBladesCount];
+
+        for (var i = 0; i < grassBlades.Length; i++)
+        {
+            var grassBlade = grassBlades[i];
+
+            var localPos = new Vector3(
+                x: Random.Range(-cappedBounds.extents.x, cappedBounds.extents.x),
+                y: 0,
+                z: Random.Range(-cappedBounds.extents.z, cappedBounds.extents.z)
+            );
+
+            RaycastHit hit;
+            var didHit = Physics.Raycast(
+                origin: transform.TransformPoint(localPos) + (transform.up * 20),
+                direction: -transform.up,
+                hitInfo: out hit
+            );
+
+            if (didHit)
+            {
+                localPos.y = hit.point.y;
+            }
+
+            grassBlade.position = transform.TransformPoint(localPos);
+
+            grassBlades[i] = grassBlade;
+        }
     }
 }
