@@ -8,9 +8,11 @@
 // with cs.SetTexture
 RWStructuredBuffer<GrassBlade> GrassBladesBuffer;
 float Time;
+int AgeNoiseColumns;
+int AgeNoiseRows;
 float WindVelocity;
-int NoiseColumns;
-int NoiseRows;
+int WindNoiseColumns;
+int WindNoiseRows;
 float3 GrassOrigin;
 float3 GrassSize;
 
@@ -25,7 +27,8 @@ void SimulateGrass (uint3 id : SV_DispatchThreadID)
         (grassLocalPosition.z + (GrassSize.z / 2)) / GrassSize.z
     );
 
-    grassBlade.noise = perlin(uv, NoiseColumns, NoiseRows, Time * WindVelocity);
+    grassBlade.ageNoise = (perlin(uv, AgeNoiseColumns, AgeNoiseRows, 1) + 1) / 2;
+    grassBlade.windNoise = perlin(uv, WindNoiseColumns, WindNoiseRows, Time * WindVelocity);
 
     GrassBladesBuffer[id.x] = grassBlade;
 }

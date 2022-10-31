@@ -4,5 +4,6 @@ public struct GrassBlade
 {
     public Vector3 position;
     public float rotationY;
-    public float noise;
+    public float windNoise;
+    public float ageNoise;
 }

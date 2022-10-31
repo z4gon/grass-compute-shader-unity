@@ -31,7 +31,7 @@ Shader "Unlit/GrassBlade_Lambert"
             struct Varyings
             {
                 float4 positionHCS : SV_POSITION;
-                float noise : TEXCOORD0;
+                float ageNoise : TEXCOORD0;
             };
 
             float4 _Color;
@@ -39,6 +39,8 @@ Shader "Unlit/GrassBlade_Lambert"
             StructuredBuffer<GrassBlade> GrassBladesBuffer;
             float3 WindDirection;
             float WindForce;
+            half4 YoungGrassColor;
+            half4 OldGrassColor;
 
             float4 positionVertexInWorld(GrassBlade grassBlade, Attributes IN) {
                 // generate a translation matrix to move the vertex
@@ -46,15 +48,16 @@ Shader "Unlit/GrassBlade_Lambert"
                 float4x4 rotationMatrix = getRotationY_Matrix(grassBlade.rotationY);
                 float4x4 transformationMatrix = mul(translationMatrix, rotationMatrix);
 
-                // translate the object pos to world pos, then use the matrix to translate it
+                // translate the object pos to world pos
                 float4 worldPosition = mul(unity_ObjectToWorld, IN.positionOS);
+                // then use the matrix to translate and rotate it
                 worldPosition = mul(transformationMatrix, worldPosition);
 
                 return worldPosition;
             }
 
             float4 applyWind(GrassBlade grassBlade, Attributes IN, float4 worldPosition) {
-                float3 displaced = worldPosition.xyz + (normalize(WindDirection) * WindForce * grassBlade.noise);
+                float3 displaced = worldPosition.xyz + (normalize(WindDirection) * WindForce * grassBlade.windNoise);
                 float4 displacedByWind = float4(displaced, 1);
 
                 // base of the grass needs to be static on the floor
@@ -74,52 +77,51 @@ Shader "Unlit/GrassBlade_Lambert"
                 // translate the world pos to clip pos
                 OUT.positionHCS = UnityWorldToClipPos(worldPosition);
 
-                OUT.noise = grassBlade.noise;
+                OUT.ageNoise = grassBlade.ageNoise;
 
                 return OUT;
             }
 
             half4 frag (Varyings IN) : SV_Target
             {
-                return _Color * IN.noise;
+                return lerp(YoungGrassColor, OldGrassColor, IN.ageNoise);
             }
             ENDCG
         }
-
         // shadow caster rendering pass, implemented manually
         // using macros from UnityCG.cginc
         // https://docs.unity3d.com/Manual/SL-VertexFragmentShaderExamples.html
-        Pass
-        {
-            Tags {"LightMode"="ShadowCaster"}
+        // Pass
+        // {
+        //     Tags {"LightMode"="ShadowCaster"}
 
-            CGPROGRAM
+        //     CGPROGRAM
 
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma multi_compile_shadowcaster
+        //     #pragma vertex vert
+        //     #pragma fragment frag
+        //     #pragma multi_compile_shadowcaster
 
-            #include "UnityCG.cginc"
+        //     #include "UnityCG.cginc"
 
-            struct v2f {
-                float4 uv: TEXCOORD0;
-                V2F_SHADOW_CASTER;
-            };
+        //     struct v2f {
+        //         float4 uv: TEXCOORD0;
+        //         V2F_SHADOW_CASTER;
+        //     };
 
-            v2f vert(appdata_base v)
-            {
-                v2f OUT;
-                OUT.uv = v.texcoord;
-                TRANSFER_SHADOW_CASTER_NORMALOFFSET(OUT)
-                return OUT;
-            }
+        //     v2f vert(appdata_base v)
+        //     {
+        //         v2f OUT;
+        //         OUT.uv = v.texcoord;
+        //         TRANSFER_SHADOW_CASTER_NORMALOFFSET(OUT)
+        //         return OUT;
+        //     }
 
-            float4 frag(v2f IN) : SV_Target
-            {
-                SHADOW_CASTER_FRAGMENT(i)
-            }
+        //     float4 frag(v2f IN) : SV_Target
+        //     {
+        //         SHADOW_CASTER_FRAGMENT(i)
+        //     }
 
-            ENDCG
-        }
+        //     ENDCG
+        // }
     }
 }

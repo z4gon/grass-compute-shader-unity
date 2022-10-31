@@ -9,6 +9,14 @@ public class GrassSystem : MonoBehaviour
     public float Density = 1f;
     public float MaxExtent = 5f;
 
+    [Header("Grass Age")]
+    [Range(1, 10)]
+    public int AgeNoiseColumns = 5;
+    [Range(1, 10)]
+    public int AgeNoiseRows = 5;
+    public Color YoungGrassColor;
+    public Color OldGrassColor;
+
     [Header("Wind")]
     public Vector3 WindDirection = new Vector3(0, 0, 1);
     [Range(0, 0.5f)]
@@ -64,7 +72,7 @@ public class GrassSystem : MonoBehaviour
 
     private void InitializeGrassBladesBuffer()
     {
-        var grassBladeMemorySize = (3 + 1 + 1) * sizeof(float);
+        var grassBladeMemorySize = (3 + 1 + 1 + 1) * sizeof(float);
 
         _grassBladesBuffer = new ComputeBuffer(
             count: _grassBlades.Length,
@@ -127,14 +135,18 @@ public class GrassSystem : MonoBehaviour
         }
 
         ComputeShader.SetFloat("Time", Time.time);
-        ComputeShader.SetInt("NoiseColumns", WindNoiseColumns);
-        ComputeShader.SetInt("NoiseRows", WindNoiseRows);
+        ComputeShader.SetInt("AgeNoiseColumns", AgeNoiseColumns);
+        ComputeShader.SetInt("AgeNoiseRows", AgeNoiseRows);
+        ComputeShader.SetInt("WindNoiseColumns", WindNoiseColumns);
+        ComputeShader.SetInt("WindNoiseRows", WindNoiseRows);
         ComputeShader.SetFloat("WindVelocity", WindVelocity);
 
         ComputeShader.Dispatch(_kernelIndex, (int)_threadGroupsCountX, 1, 1);
 
         Material.SetVector("WindDirection", WindDirection);
         Material.SetFloat("WindForce", WindForce);
+        Material.SetColor("YoungGrassColor", YoungGrassColor);
+        Material.SetColor("OldGrassColor", OldGrassColor);
 
         Graphics.DrawMeshInstancedIndirect(
             mesh: _mesh,
