@@ -1,4 +1,4 @@
-Shader "Unlit/GrassBlade_Lambert"
+Shader "Unlit/GrassBladeUnlit"
 {
     Properties
     {
@@ -35,7 +35,6 @@ Shader "Unlit/GrassBlade_Lambert"
             {
                 float4 pos : SV_POSITION;
                 float ageNoise : TEXCOORD0;
-                fixed3 diffuse: COLOR0;
                 SHADOW_COORDS(1) // put shadows data into TEXCOORD1
             };
 
