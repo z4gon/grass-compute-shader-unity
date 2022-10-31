@@ -101,9 +101,9 @@ public static class GrassFactory
         bounds = new Bounds(
             transform.position,
             new Vector3(
-                System.Math.Min(meshBounds.extents.x, maxExtent),
-                meshBounds.extents.y,
-                System.Math.Min(meshBounds.extents.z, maxExtent)
+                System.Math.Min(meshBounds.extents.x, maxExtent) * 2,
+                meshBounds.extents.y * 2,
+                System.Math.Min(meshBounds.extents.z, maxExtent) * 2
             )
         );
 

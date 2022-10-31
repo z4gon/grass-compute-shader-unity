@@ -25,21 +25,39 @@ Shader "Unlit/GrassBlade_Lambert"
             struct Attributes
             {
                 float4 positionOS : POSITION;
-                float2 uv : TEXCOORD0;
+                float2 uv : TEXCOORD;
             };
 
             struct Varyings
             {
                 float4 positionHCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                float noise : COLOR0;
+                float noise : TEXCOORD0;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
             float4 _Color;
 
             StructuredBuffer<GrassBlade> GrassBladesBuffer;
+            float3 WindDirection;
+            float WindForce;
+
+            float4 positionVertexInWorld(GrassBlade grassBlade, Attributes IN) {
+                // generate a translation matrix to move the vertex
+                float4x4 translationMatrix = getTranslation_Matrix(grassBlade.position);
+
+                // translate the object pos to world pos, then use the matrix to translate it
+                float4 worldPosition = mul(unity_ObjectToWorld, IN.positionOS);
+                worldPosition = mul(translationMatrix, worldPosition);
+
+                return worldPosition;
+            }
+
+            float4 applyWind(GrassBlade grassBlade, Attributes IN, float4 worldPosition) {
+                float3 displaced = worldPosition.xyz + (normalize(WindDirection) * WindForce * grassBlade.noise);
+                float4 displacedByWind = float4(displaced, 1);
+
+                // base of the grass needs to be static on the floor
+                return lerp(worldPosition, displacedByWind, IN.uv.y);
+            }
 
             Varyings vert (Attributes IN, uint vertex_id: SV_VERTEXID, uint instance_id: SV_INSTANCEID)
             {
@@ -48,18 +66,14 @@ Shader "Unlit/GrassBlade_Lambert"
                 // get the instanced grass blade
                 GrassBlade grassBlade = GrassBladesBuffer[instance_id];
 
-                // generate a translation matrix to move the vertex
-                float4x4 translationMatrix = getTranslation_Matrix(grassBlade.position);
-
-                // translate the object pos to world pos, then use the matrix to translate it
-                float4 worldPosition = mul(unity_ObjectToWorld, IN.positionOS);
-                worldPosition = mul(translationMatrix, worldPosition);
+                float4 worldPosition = positionVertexInWorld(grassBlade, IN);
+                worldPosition = applyWind(grassBlade, IN, worldPosition);
 
                 // translate the world pos to clip pos
                 OUT.positionHCS = UnityWorldToClipPos(worldPosition);
 
-                OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
                 OUT.noise = grassBlade.noise;
+
                 return OUT;
             }
 

@@ -48,8 +48,8 @@ float2 gradient(int seed, float time)
 // https://adrianb.io/2014/08/09/perlinnoise.html
 float perlin(
     float2 uv,
-    int columns,
-    int rows,
+    uint columns,
+    uint rows,
     float time = 1
 )
 {
@@ -58,8 +58,8 @@ float perlin(
     float squareHeight = 1 / float(rows);
 
     // current square
-    int column = floor(uv.x / squareWidth);
-    int row = floor(uv.y / squareHeight);
+    uint column = floor(uv.x / squareWidth);
+    uint row = floor(uv.y / squareHeight);
 
     // corners
     float2 topLeft = float2(0.0,1.0);
@@ -68,8 +68,8 @@ float perlin(
     float2 bottomRight = float2(1.0,0.0);
 
     // get index for the lookup table
-    int X = column % 256;
-    int Y = row % 256;
+    uint X = column % 256;
+    uint Y = row % 256;
 
     // gradients
     float2 gradientTopLeft = gradient(P[P[X] + Y+1], time);

@@ -7,6 +7,9 @@
 // with cs.SetTexture
 RWStructuredBuffer<GrassBlade> GrassBladesBuffer;
 float Time;
+float WindVelocity;
+uint NoiseColumns;
+uint NoiseRows;
 float GrassBoundsX;
 float GrassBoundsY;
 
@@ -20,7 +23,7 @@ void SimulateGrass (uint3 id : SV_DispatchThreadID)
         (grassBlade.position.y + GrassBoundsY) / (2 * GrassBoundsY)
     );
 
-    grassBlade.noise = perlin(uv, 5, 5, Time);
+    grassBlade.noise = perlin(uv, NoiseColumns, NoiseRows, Time * WindVelocity);
 
     GrassBladesBuffer[id.x] = grassBlade;
 }

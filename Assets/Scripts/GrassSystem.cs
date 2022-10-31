@@ -7,6 +7,10 @@ public class GrassSystem : MonoBehaviour
     public ComputeShader ComputeShader;
     public float Density = 1f;
     public float MaxExtent = 5f;
+    public Vector2 NoiseTiling = new Vector2(10, 10);
+    public Vector3 WindDirection = new Vector3(0, 0, 1);
+    public float WindForce = 0.05f;
+    public float WindVelocity = 2f;
 
     private GrassBlade[] _grassBlades;
     private ComputeBuffer _grassBladesBuffer;
@@ -112,7 +116,14 @@ public class GrassSystem : MonoBehaviour
         }
 
         ComputeShader.SetFloat("Time", Time.time);
+        ComputeShader.SetInt("NoiseColumns", (int)System.Math.Floor(NoiseTiling.x));
+        ComputeShader.SetInt("NoiseRows", (int)System.Math.Floor(NoiseTiling.y));
+        ComputeShader.SetFloat("WindVelocity", WindVelocity);
         ComputeShader.Dispatch(_kernelIndex, (int)_threadGroupsCountX, 1, 1);
+
+        Material.SetVector("WindDirection", WindDirection);
+        Material.SetFloat("WindForce", WindForce);
+
         Graphics.DrawMeshInstancedIndirect(
             mesh: _mesh,
             submeshIndex: 0,
@@ -135,18 +146,28 @@ public class GrassSystem : MonoBehaviour
         }
     }
 
-    void OnDrawGizmos()
+    void DrawWindGizmo()
     {
+        Gizmos.color = Color.white;
+        var origin = transform.position + (Vector3.up * 2);
+        Gizmos.DrawSphere(origin, 0.1f);
+        Gizmos.DrawLine(origin, origin + WindDirection);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        DrawWindGizmo();
+
         if (!_isInitialized)
         {
             return;
         }
 
-        // Gizmos.DrawSphere(new Vector3(1, 0, 1), 0.1f);
-        for (var i = 0; i < _grassBlades.Length; i++)
-        {
-            // Debug.Log($"grassBlade.position {_grassBlades[i].position}");
-            Gizmos.DrawSphere(_grassBlades[i].position, 0.01f);
-        }
+        // // Gizmos.DrawSphere(new Vector3(1, 0, 1), 0.1f);
+        // for (var i = 0; i < _grassBlades.Length; i++)
+        // {
+        //     // Debug.Log($"grassBlade.position {_grassBlades[i].position}");
+        //     Gizmos.DrawSphere(_grassBlades[i].position, 0.01f);
+        // }
     }
 }
