@@ -12,6 +12,7 @@ public class GrassSystem : MonoBehaviour
     private ComputeBuffer _grassBladesBuffer;
 
     private int _kernelIndex;
+    private uint _threadGroupsCountX;
 
     // for Graphics.DrawMeshInstancedIndirect
     private ComputeBuffer _argsBuffer;
@@ -29,6 +30,7 @@ public class GrassSystem : MonoBehaviour
         InitializeGrassBlades();
         InitializeGrassBladesBuffer();
         InitializeIndirectArgsBuffer();
+        IntitalizeThreadGroupsSize();
 
         _isInitialized = true;
     }
@@ -60,10 +62,10 @@ public class GrassSystem : MonoBehaviour
         _kernelIndex = ComputeShader.FindKernel("SimulateGrass");
 
         // this will let compute shader access the buffers
-        ComputeShader.SetBuffer(_kernelIndex, "GrassBlades", _grassBladesBuffer);
+        ComputeShader.SetBuffer(_kernelIndex, "GrassBladesBuffer", _grassBladesBuffer);
 
         // this will let the surface shader access the buffer
-        Material.SetBuffer("GrassBlades", _grassBladesBuffer);
+        Material.SetBuffer("GrassBladesBuffer", _grassBladesBuffer);
     }
 
     private void InitializeIndirectArgsBuffer()
@@ -73,7 +75,7 @@ public class GrassSystem : MonoBehaviour
         const int _argsCount = 5;
 
         _argsBuffer = new ComputeBuffer(
-            count: _grassBladesCount,
+            count: 1,
             stride: _argsCount * sizeof(uint),
             type: ComputeBufferType.IndirectArguments
         );
@@ -83,11 +85,19 @@ public class GrassSystem : MonoBehaviour
         // to get the instance_id and vertex_id
         var args = new int[_argsCount] {
             (int)_mesh.GetIndexCount(submesh: 0),       // indices of the mesh
-            1,                                          // number of objects to render
+            _grassBladesCount,                          // number of objects to render
             0,0,0                                       // unused args
         };
 
         _argsBuffer.SetData(args);
+    }
+
+    private void IntitalizeThreadGroupsSize()
+    {
+        // calculate amount of thread groups
+        uint threadGroupSizeX;
+        ComputeShader.GetKernelThreadGroupSizes(_kernelIndex, out threadGroupSizeX, out _, out _);
+        _threadGroupsCountX = (uint)_grassBlades.Length / threadGroupSizeX;
     }
 
     // Update is called once per frame
@@ -99,7 +109,7 @@ public class GrassSystem : MonoBehaviour
         }
 
         ComputeShader.SetFloat("Time", Time.time);
-        ComputeShader.Dispatch(_kernelIndex, _grassBlades.Length, 1, 1);
+        ComputeShader.Dispatch(_kernelIndex, (int)_threadGroupsCountX, 1, 1);
         Graphics.DrawMeshInstancedIndirect(
             mesh: _mesh,
             submeshIndex: 0,
