@@ -1,4 +1,4 @@
-# Procedural Grass with Compute Shaders
+# Procedural Grass System with Compute Shaders in Unity
 
 Written in HLSL for **Unity 2021.3.10f1**
 
