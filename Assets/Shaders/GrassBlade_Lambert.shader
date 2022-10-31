@@ -15,16 +15,14 @@ Shader "Unlit/GrassBlade_Lambert"
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile_instancing
-
-            // compile shader into multiple variants, with and without shadows
-            // (we don't care about any lightmaps yet, so skip these variants)
             #pragma multi_compile_fwdbase
-            // shadow helper functions and macros
-            #include "AutoLight.cginc"
+
             #include "UnityCG.cginc"
+            #include "AutoLight.cginc"
 
             #include "./shared/GrassBlade.cginc"
             #include "./shared/Transformations.cginc"
+            #include "./shared/GrassVertexManipulations.cginc"
 
             struct Attributes
             {
@@ -40,8 +38,6 @@ Shader "Unlit/GrassBlade_Lambert"
                 fixed3 diffuse: COLOR0;
                 SHADOW_COORDS(1) // put shadows data into TEXCOORD1
             };
-
-            #include "./shared/GrassVertexManipulations.cginc"
 
             StructuredBuffer<GrassBlade> GrassBladesBuffer;
             float3 WindDirection;
@@ -101,6 +97,7 @@ Shader "Unlit/GrassBlade_Lambert"
 
             #include "./shared/GrassBlade.cginc"
             #include "./shared/Transformations.cginc"
+            #include "./shared/GrassVertexManipulations.cginc"
 
             struct Attributes
             {
@@ -113,7 +110,6 @@ Shader "Unlit/GrassBlade_Lambert"
                 float4 positionHCS : SV_POSITION;
             };
 
-            #include "./shared/GrassVertexManipulations.cginc"
 
             StructuredBuffer<GrassBlade> GrassBladesBuffer;
             float3 WindDirection;
