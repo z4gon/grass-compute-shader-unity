@@ -3,9 +3,10 @@ using UnityEngine;
 public static class GrassFactory
 {
     const float Height = 0.2f;
+    const float Width = Height / 12;
     const int StepsCount = 4;
     const float StepHeight = Height / StepsCount;
-    const float HalfWidth = Height / 10;
+    const float HalfWidth = Width / 2;
 
     // Start is called before the first frame update
     public static Mesh GetGrassBladeMesh()
@@ -19,19 +20,19 @@ public static class GrassFactory
             new Vector3(HalfWidth, 0, 0),
 
             // step 1
-            new Vector3(-HalfWidth * 0.9f, StepHeight, 0),
-            new Vector3(HalfWidth * 0.9f, StepHeight, 0),
+            new Vector3(-HalfWidth * 0.9f, StepHeight, 0.005f),
+            new Vector3(HalfWidth * 0.9f, StepHeight, 0.005f),
 
             // step 2
-            new Vector3(-HalfWidth * 0.8f, 2 * StepHeight, 0),
-            new Vector3(HalfWidth * 0.8f, 2 * StepHeight, 0),
+            new Vector3(-HalfWidth * 0.8f, 2 * StepHeight, 0.01f),
+            new Vector3(HalfWidth * 0.8f, 2 * StepHeight, 0.01f),
 
             // step 3
-            new Vector3(-HalfWidth * 0.6f, 3 * StepHeight, 0),
-            new Vector3(HalfWidth * 0.6f, 3 * StepHeight, 0),
+            new Vector3(-HalfWidth * 0.6f, 3 * StepHeight, 0.025f),
+            new Vector3(HalfWidth * 0.6f, 3 * StepHeight, 0.025f),
 
             // step 4
-            new Vector3(0, 4 * StepHeight, 0)
+            new Vector3(0, 4 * StepHeight, 0.05f)
         };
 
         // define the normals

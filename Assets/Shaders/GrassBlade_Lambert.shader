@@ -22,7 +22,7 @@ Shader "Unlit/GrassBlade_Lambert"
             #include "./shared/GrassBlade.cginc"
             #include "./shared/Transformations.cginc"
 
-            struct Input
+            struct Attributes
             {
                 float4 positionOS : POSITION;
                 float2 uv : TEXCOORD0;
@@ -40,7 +40,7 @@ Shader "Unlit/GrassBlade_Lambert"
 
             StructuredBuffer<GrassBlade> GrassBladesBuffer;
 
-            Varyings vert (Input IN, uint vertex_id: SV_VERTEXID, uint instance_id: SV_INSTANCEID)
+            Varyings vert (Attributes IN, uint vertex_id: SV_VERTEXID, uint instance_id: SV_INSTANCEID)
             {
                 Varyings OUT;
 
@@ -65,6 +65,42 @@ Shader "Unlit/GrassBlade_Lambert"
             {
                 return _Color;
             }
+            ENDCG
+        }
+
+        // shadow caster rendering pass, implemented manually
+        // using macros from UnityCG.cginc
+        // https://docs.unity3d.com/Manual/SL-VertexFragmentShaderExamples.html
+        Pass
+        {
+            Tags {"LightMode"="ShadowCaster"}
+
+            CGPROGRAM
+
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma multi_compile_shadowcaster
+
+            #include "UnityCG.cginc"
+
+            struct v2f {
+                float4 uv: TEXCOORD0;
+                V2F_SHADOW_CASTER;
+            };
+
+            v2f vert(appdata_base v)
+            {
+                v2f OUT;
+                OUT.uv = v.texcoord;
+                TRANSFER_SHADOW_CASTER_NORMALOFFSET(OUT)
+                return OUT;
+            }
+
+            float4 frag(v2f IN) : SV_Target
+            {
+                SHADOW_CASTER_FRAGMENT(i)
+            }
+
             ENDCG
         }
     }
