@@ -1,15 +1,26 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel SimulateGrass
 #include "./shared/GrassBlade.cginc"
+#include "./shared/PerlinNoise.cginc"
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWStructuredBuffer<GrassBlade> GrassBladesBuffer;
+float Time;
+float GrassBoundsX;
+float GrassBoundsY;
 
 [numthreads(1,1,1)]
 void SimulateGrass (uint3 id : SV_DispatchThreadID)
 {
-    // TODO: insert actual code here!
+    GrassBlade grassBlade = GrassBladesBuffer[id.x];
 
-    // Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    float2 uv = float2(
+        (grassBlade.position.x + GrassBoundsX) / (2 * GrassBoundsX),
+        (grassBlade.position.y + GrassBoundsY) / (2 * GrassBoundsY)
+    );
+
+    grassBlade.noise = perlin(uv, 5, 5, Time);
+
+    GrassBladesBuffer[id.x] = grassBlade;
 }

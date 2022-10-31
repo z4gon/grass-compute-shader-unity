@@ -31,7 +31,7 @@ Shader "Custom/GrassBlade"
 
         half _Glossiness;
         half _Metallic;
-        fixed4 _Color;
+        half4 _Color;
 
         // #ifdef SHADER_API_D3D11
         //     StructuredBuffer<GrassBlade> GrassBladesBuffer;
@@ -67,7 +67,7 @@ Shader "Custom/GrassBlade"
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
             // Albedo comes from a texture tinted by color
-            fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
+            half4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;

@@ -96,19 +96,19 @@ public static class GrassFactory
         out GrassBlade[] grassBlades
     )
     {
-        bounds = meshFilter.sharedMesh.bounds;
+        var meshBounds = meshFilter.sharedMesh.bounds;
 
-        var cappedBounds = new Bounds(
+        bounds = new Bounds(
             transform.position,
             new Vector3(
-                System.Math.Min(bounds.extents.x, maxExtent),
-                bounds.extents.y,
-                System.Math.Min(bounds.extents.z, maxExtent)
+                System.Math.Min(meshBounds.extents.x, maxExtent),
+                meshBounds.extents.y,
+                System.Math.Min(meshBounds.extents.z, maxExtent)
             )
         );
 
-        var grassBladesCountX = cappedBounds.extents.x * 2 * density;
-        var grassBladesCountY = cappedBounds.extents.y * 2 * density;
+        var grassBladesCountX = bounds.extents.x * 2 * density;
+        var grassBladesCountY = bounds.extents.y * 2 * density;
 
         grassBladesCount = (int)(grassBladesCountX * grassBladesCountY);
 
@@ -119,9 +119,9 @@ public static class GrassFactory
             var grassBlade = grassBlades[i];
 
             var localPos = new Vector3(
-                x: Random.Range(-cappedBounds.extents.x, cappedBounds.extents.x),
+                x: Random.Range(-bounds.extents.x, bounds.extents.x),
                 y: 0,
-                z: Random.Range(-cappedBounds.extents.z, cappedBounds.extents.z)
+                z: Random.Range(-bounds.extents.z, bounds.extents.z)
             );
 
             RaycastHit hit;

@@ -32,6 +32,7 @@ Shader "Unlit/GrassBlade_Lambert"
             {
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
+                float noise : COLOR0;
             };
 
             sampler2D _MainTex;
@@ -58,12 +59,13 @@ Shader "Unlit/GrassBlade_Lambert"
                 OUT.positionHCS = UnityWorldToClipPos(worldPosition);
 
                 OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+                OUT.noise = grassBlade.noise;
                 return OUT;
             }
 
             half4 frag (Varyings IN) : SV_Target
             {
-                return _Color;
+                return _Color * IN.noise;
             }
             ENDCG
         }

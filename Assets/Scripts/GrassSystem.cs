@@ -30,7 +30,7 @@ public class GrassSystem : MonoBehaviour
         InitializeGrassBlades();
         InitializeGrassBladesBuffer();
         InitializeIndirectArgsBuffer();
-        IntitalizeThreadGroupsSize();
+        InitializeThreadGroupsSize();
 
         _isInitialized = true;
     }
@@ -46,11 +46,14 @@ public class GrassSystem : MonoBehaviour
             grassBladesCount: out _grassBladesCount,
             grassBlades: out _grassBlades
         );
+
+        ComputeShader.SetFloat("GrassBoundsX", _bounds.extents.x);
+        ComputeShader.SetFloat("GrassBoundsY", _bounds.extents.y);
     }
 
     private void InitializeGrassBladesBuffer()
     {
-        var grassBladeMemorySize = (3) * sizeof(float);
+        var grassBladeMemorySize = (3 + 1) * sizeof(float);
 
         _grassBladesBuffer = new ComputeBuffer(
             count: _grassBlades.Length,
@@ -92,7 +95,7 @@ public class GrassSystem : MonoBehaviour
         _argsBuffer.SetData(args);
     }
 
-    private void IntitalizeThreadGroupsSize()
+    private void InitializeThreadGroupsSize()
     {
         // calculate amount of thread groups
         uint threadGroupSizeX;
