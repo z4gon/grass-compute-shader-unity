@@ -33,6 +33,32 @@ float4x4 getTranslation_Matrix(float3 origin){
 
 // https://en.wikipedia.org/wiki/Matrix_multiplication
 // https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html
+float4x4 getRotationX_Matrix(float thetaZ){
+
+    float c = cos(thetaZ);
+    float s = sin(thetaZ);
+
+    return float4x4(
+        1, 0, 0, 0,
+        0, c, s, 0,
+        0, -s, c, 0,
+        0, 0, 0, 1
+    );
+}
+
+float4x4 getRotationY_Matrix(float thetaZ){
+
+    float c = cos(thetaZ);
+    float s = sin(thetaZ);
+
+    return float4x4(
+        c, 0, -s, 0,
+        0, 1, 0, 0,
+        s, 0, c, 0,
+        0, 0, 0, 1
+    );
+}
+
 float4x4 getRotationZ_Matrix(float thetaZ){
 
     float c = cos(thetaZ);
@@ -44,8 +70,4 @@ float4x4 getRotationZ_Matrix(float thetaZ){
         0, 0, 1, 0,
         0, 0, 0, 1
     );
-}
-
-float4x4 getTransformation_Matrix(float3 origin, float thetaZ) {
-    return mul(getTranslation_Matrix(origin), getRotationZ_Matrix(thetaZ));
 }

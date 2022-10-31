@@ -138,6 +138,8 @@ public static class GrassFactory
 
             grassBlade.position = transform.TransformPoint(localPos);
 
+            grassBlade.rotationY = Random.Range((float)-System.Math.PI, (float)System.Math.PI);
+
             grassBlades[i] = grassBlade;
         }
     }

@@ -64,7 +64,7 @@ public class GrassSystem : MonoBehaviour
 
     private void InitializeGrassBladesBuffer()
     {
-        var grassBladeMemorySize = (3 + 1) * sizeof(float);
+        var grassBladeMemorySize = (3 + 1 + 1) * sizeof(float);
 
         _grassBladesBuffer = new ComputeBuffer(
             count: _grassBlades.Length,

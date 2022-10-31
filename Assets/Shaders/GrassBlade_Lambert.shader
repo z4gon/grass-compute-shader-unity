@@ -43,10 +43,12 @@ Shader "Unlit/GrassBlade_Lambert"
             float4 positionVertexInWorld(GrassBlade grassBlade, Attributes IN) {
                 // generate a translation matrix to move the vertex
                 float4x4 translationMatrix = getTranslation_Matrix(grassBlade.position);
+                float4x4 rotationMatrix = getRotationY_Matrix(grassBlade.rotationY);
+                float4x4 transformationMatrix = mul(translationMatrix, rotationMatrix);
 
                 // translate the object pos to world pos, then use the matrix to translate it
                 float4 worldPosition = mul(unity_ObjectToWorld, IN.positionOS);
-                worldPosition = mul(translationMatrix, worldPosition);
+                worldPosition = mul(transformationMatrix, worldPosition);
 
                 return worldPosition;
             }

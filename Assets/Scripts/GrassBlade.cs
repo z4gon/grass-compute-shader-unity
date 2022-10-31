@@ -3,6 +3,6 @@ using UnityEngine;
 public struct GrassBlade
 {
     public Vector3 position;
-    // public Vector3 rotation;
+    public float rotationY;
     public float noise;
 }
