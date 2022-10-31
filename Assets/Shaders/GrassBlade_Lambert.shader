@@ -76,7 +76,7 @@ Shader "Unlit/GrassBlade_Lambert"
             half4 frag (Varyings IN) : SV_Target
             {
                 fixed shadow = SHADOW_ATTENUATION(IN);
-                return lerp(YoungGrassColor, OldGrassColor, IN.ageNoise) /* * float4(IN.diffuse, 1) */ * clamp(shadow, 0.3, 1);
+                return lerp(YoungGrassColor, OldGrassColor, IN.ageNoise) * clamp(shadow, 0.2, 1);
             }
             ENDCG
         }
