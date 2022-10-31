@@ -451,8 +451,8 @@ MonoBehaviour:
   YoungGrassColor: {r: 0, g: 0.59607846, b: 0.07058824, a: 0}
   OldGrassColor: {r: 0.6431373, g: 0, b: 0.05490196, a: 0}
   WindDirection: {x: 0, y: 0, z: 1}
-  WindForce: 0.05
-  WindVelocity: 2
+  WindForce: 0.119
+  WindVelocity: 1.7
   WindNoiseColumns: 5
   WindNoiseRows: 5
 --- !u!4 &852264220 stripped
