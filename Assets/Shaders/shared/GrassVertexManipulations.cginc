@@ -19,3 +19,22 @@ float4 applyWind(GrassBlade grassBlade, float2 uv, float4 worldPosition, float3 
     // base of the grass needs to be static on the floor
     return lerp(worldPosition, displacedByWind, uv.y);
 }
+
+float4 positionGrassVertexInHClipPos(
+    StructuredBuffer<GrassBlade> GrassBladesBuffer,
+    uint instance_id,
+    out GrassBlade grassBlade,
+    float4 positionOS,
+    float2 uv,
+    float3 windDirection,
+    float windForce
+) {
+    // get the instanced grass blade
+    grassBlade = GrassBladesBuffer[instance_id];
+
+    float4 worldPosition = positionVertexInWorld(grassBlade, positionOS);
+    worldPosition = applyWind(grassBlade, uv, worldPosition, windDirection, windForce);
+
+    // translate the world pos to clip pos
+    return UnityWorldToClipPos(worldPosition);
+}

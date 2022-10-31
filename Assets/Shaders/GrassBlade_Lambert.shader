@@ -5,12 +5,9 @@ Shader "Unlit/GrassBlade_Lambert"
     }
     SubShader
     {
-        // Tags { "IgnoreProjector"="True" "RenderType"="Grass" "DisableBatching"="True"}}
-
         Pass
         {
-            Tags {"RenderType" = "Opaque"}
-            // Tags {"LightMode" = "ForwardBase"}
+            Tags {"LightMode"="ForwardBase"}
 
             Cull Off
 
@@ -18,10 +15,13 @@ Shader "Unlit/GrassBlade_Lambert"
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile_instancing
-            #pragma multi_compile_fwdbase
 
-            #include "UnityCG.cginc"
+            // compile shader into multiple variants, with and without shadows
+            // (we don't care about any lightmaps yet, so skip these variants)
+            #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
+            // shadow helper functions and macros
             #include "AutoLight.cginc"
+            #include "UnityCG.cginc"
 
             #include "./shared/GrassBlade.cginc"
             #include "./shared/Transformations.cginc"
@@ -38,7 +38,7 @@ Shader "Unlit/GrassBlade_Lambert"
                 float4 pos : SV_POSITION;
                 float ageNoise : TEXCOORD0;
                 fixed3 diffuse: COLOR0;
-                SHADOW_COORDS(1)
+                SHADOW_COORDS(1) // put shadows data into TEXCOORD1
             };
 
             #include "./shared/GrassVertexManipulations.cginc"
@@ -55,14 +55,16 @@ Shader "Unlit/GrassBlade_Lambert"
 
                 // position vertex for GPU instancing ---------------------------------------------------
 
-                // get the instanced grass blade
-                GrassBlade grassBlade = GrassBladesBuffer[instance_id];
-
-                float4 worldPosition = positionVertexInWorld(grassBlade, IN.positionOS);
-                worldPosition = applyWind(grassBlade, IN.uv, worldPosition, WindDirection, WindForce);
-
-                // translate the world pos to clip pos
-                OUT.pos = UnityWorldToClipPos(worldPosition);
+                GrassBlade grassBlade;
+                OUT.pos = positionGrassVertexInHClipPos(
+                    GrassBladesBuffer,
+                    instance_id,
+                    grassBlade,
+                    IN.positionOS,
+                    IN.uv,
+                    WindDirection,
+                    WindForce
+                );
 
                 // shadows -------------------------------------------------------------------------------
 
@@ -116,21 +118,23 @@ Shader "Unlit/GrassBlade_Lambert"
             StructuredBuffer<GrassBlade> GrassBladesBuffer;
             float3 WindDirection;
             float WindForce;
-            half4 YoungGrassColor;
-            half4 OldGrassColor;
 
             Varyings vert (Attributes IN, uint vertex_id: SV_VERTEXID, uint instance_id: SV_INSTANCEID)
             {
                 Varyings OUT;
 
-                // get the instanced grass blade
-                GrassBlade grassBlade = GrassBladesBuffer[instance_id];
+                // position vertex for GPU instancing ---------------------------------------------------
 
-                float4 worldPosition = positionVertexInWorld(grassBlade, IN.positionOS);
-                worldPosition = applyWind(grassBlade, IN.uv, worldPosition, WindDirection, WindForce);
-
-                // translate the world pos to clip pos
-                OUT.positionHCS = UnityWorldToClipPos(worldPosition);
+                GrassBlade grassBlade;
+                OUT.positionHCS = positionGrassVertexInHClipPos(
+                    GrassBladesBuffer,
+                    instance_id,
+                    grassBlade,
+                    IN.positionOS,
+                    IN.uv,
+                    WindDirection,
+                    WindForce
+                );
 
                 return OUT;
             }
