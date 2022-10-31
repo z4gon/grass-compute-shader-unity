@@ -5,12 +5,21 @@ public class GrassSystem : MonoBehaviour
 {
     public Material Material;
     public ComputeShader ComputeShader;
+    [Header("Grass")]
     public float Density = 1f;
     public float MaxExtent = 5f;
-    public Vector2 NoiseTiling = new Vector2(10, 10);
+
+    [Header("Wind")]
     public Vector3 WindDirection = new Vector3(0, 0, 1);
+    [Range(0, 0.5f)]
     public float WindForce = 0.05f;
+    [Range(0.1f, 15f)]
     public float WindVelocity = 2f;
+
+    [Range(1, 10)]
+    public int WindNoiseColumns = 5;
+    [Range(1, 10)]
+    public int WindNoiseRows = 5;
 
     private GrassBlade[] _grassBlades;
     private ComputeBuffer _grassBladesBuffer;
@@ -35,6 +44,7 @@ public class GrassSystem : MonoBehaviour
         InitializeGrassBladesBuffer();
         InitializeIndirectArgsBuffer();
         InitializeThreadGroupsSize();
+        SetOneTimeValues();
 
         _isInitialized = true;
     }
@@ -50,9 +60,6 @@ public class GrassSystem : MonoBehaviour
             grassBladesCount: out _grassBladesCount,
             grassBlades: out _grassBlades
         );
-
-        ComputeShader.SetFloat("GrassBoundsX", _bounds.extents.x);
-        ComputeShader.SetFloat("GrassBoundsY", _bounds.extents.y);
     }
 
     private void InitializeGrassBladesBuffer()
@@ -77,8 +84,6 @@ public class GrassSystem : MonoBehaviour
 
     private void InitializeIndirectArgsBuffer()
     {
-        _bounds = new Bounds(center: Vector3.zero, size: Vector3.one * 1000);
-
         const int _argsCount = 5;
 
         _argsBuffer = new ComputeBuffer(
@@ -107,6 +112,12 @@ public class GrassSystem : MonoBehaviour
         _threadGroupsCountX = (uint)_grassBlades.Length / threadGroupSizeX;
     }
 
+    private void SetOneTimeValues()
+    {
+        ComputeShader.SetVector("GrassSize", _bounds.size);
+        ComputeShader.SetVector("GrassOrigin", transform.position);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -116,9 +127,10 @@ public class GrassSystem : MonoBehaviour
         }
 
         ComputeShader.SetFloat("Time", Time.time);
-        ComputeShader.SetInt("NoiseColumns", (int)System.Math.Floor(NoiseTiling.x));
-        ComputeShader.SetInt("NoiseRows", (int)System.Math.Floor(NoiseTiling.y));
+        ComputeShader.SetInt("NoiseColumns", WindNoiseColumns);
+        ComputeShader.SetInt("NoiseRows", WindNoiseRows);
         ComputeShader.SetFloat("WindVelocity", WindVelocity);
+
         ComputeShader.Dispatch(_kernelIndex, (int)_threadGroupsCountX, 1, 1);
 
         Material.SetVector("WindDirection", WindDirection);

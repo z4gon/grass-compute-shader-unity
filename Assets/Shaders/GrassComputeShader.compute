@@ -1,5 +1,6 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel SimulateGrass
+
 #include "./shared/GrassBlade.cginc"
 #include "./shared/PerlinNoise.cginc"
 
@@ -8,19 +9,20 @@
 RWStructuredBuffer<GrassBlade> GrassBladesBuffer;
 float Time;
 float WindVelocity;
-uint NoiseColumns;
-uint NoiseRows;
-float GrassBoundsX;
-float GrassBoundsY;
+int NoiseColumns;
+int NoiseRows;
+float3 GrassOrigin;
+float3 GrassSize;
 
 [numthreads(1,1,1)]
 void SimulateGrass (uint3 id : SV_DispatchThreadID)
 {
     GrassBlade grassBlade = GrassBladesBuffer[id.x];
 
+    float3 grassLocalPosition = grassBlade.position - GrassOrigin;
     float2 uv = float2(
-        (grassBlade.position.x + GrassBoundsX) / (2 * GrassBoundsX),
-        (grassBlade.position.y + GrassBoundsY) / (2 * GrassBoundsY)
+        (grassLocalPosition.x + (GrassSize.x / 2)) / GrassSize.x,
+        (grassLocalPosition.z + (GrassSize.z / 2)) / GrassSize.z
     );
 
     grassBlade.noise = perlin(uv, NoiseColumns, NoiseRows, Time * WindVelocity);
