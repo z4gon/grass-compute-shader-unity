@@ -267,7 +267,7 @@ Light:
   m_InnerSpotAngle: 21.802082
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 1
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -444,10 +444,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Material: {fileID: 2100000, guid: 6596108dae55c40e7b84a2ad7e8e0fe7, type: 2}
   ComputeShader: {fileID: 7200000, guid: cd98ec0c441024352bcf99c2f94d7b9b, type: 3}
-  Density: 18
+  Density: 21
   MaxExtent: 2.5
-  AgeNoiseColumns: 3
-  AgeNoiseRows: 3
+  AgeNoiseColumns: 4
+  AgeNoiseRows: 6
   YoungGrassColor: {r: 0.0039215763, g: 0.3764706, b: 0.046577837, a: 0}
   OldGrassColor: {r: 0.39607844, g: 0.012003427, b: 0, a: 0}
   WindDirection: {x: 0, y: 0, z: 1}

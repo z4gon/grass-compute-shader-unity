@@ -18,7 +18,7 @@ Shader "Unlit/GrassBlade_Lambert"
 
             // compile shader into multiple variants, with and without shadows
             // (we don't care about any lightmaps yet, so skip these variants)
-            #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
+            #pragma multi_compile_fwdbase
             // shadow helper functions and macros
             #include "AutoLight.cginc"
             #include "UnityCG.cginc"
@@ -89,7 +89,7 @@ Shader "Unlit/GrassBlade_Lambert"
         {
             Tags {"LightMode"="ShadowCaster"}
 
-            ColorMask 0
+            Cull Off
 
             CGPROGRAM
             #pragma vertex vert
