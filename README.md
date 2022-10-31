@@ -40,6 +40,8 @@ https://user-images.githubusercontent.com/4588601/199116273-03083ae9-0bd7-40e1-b
 
 - Create a **Mesh** procedurally, to render the grass blades.
 
+![Mesh](./docs/blade.jpg)
+
 ```cs
 public static Mesh GetGrassBladeMesh()
 {
